@@ -122,18 +122,6 @@ end]]
 
 local strategyFunctions = Strategies.functions
 
---[[strategyFunctions.grabPCPotion = function()
-	if Inventory.contains("potion") then
-		return true
-	end
-	Player.interact("Up")
-end
-	
-strategyFunctions.checkStrats = function()
-	UsingSTRATS = STRATS
-	return true
-end]]
-
 strategyFunctions.talk_mom = function()
 	if Strategies.initialize() then
 		status.tempDir = false

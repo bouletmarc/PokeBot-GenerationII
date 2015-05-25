@@ -113,9 +113,6 @@ function Input.escape()
 			end
 		end
 	end
-	--local inputTable = {Right=true, Down=true}
-	--joypad.set(inputTable)
-	--bridgeButton("D,R")
 end
 
 function Input.clear()

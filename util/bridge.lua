@@ -1,9 +1,9 @@
 local Bridge = {}
 
---local socket
---if INTERNAL then
---	socket = require("socket")
---end
+local socket
+if INTERNAL then
+	socket = require("socket")
+end
 
 local utils = require("util.utils")
 
@@ -21,7 +21,7 @@ local function send(prefix, body)
 	end
 end
 
---[[local function readln()
+local function readln()
 	if client then
 		local s, status, partial = client:receive("*l")
 		if status == "closed" then
@@ -32,11 +32,11 @@ end
 			return s
 		end
 	end
-end]]
+end
 
 -- Wrapper functions
 
---[[function Bridge.init()
+function Bridge.init()
 	if socket then
 		-- io.popen("java -jar Main.jar")
 		client = socket.connect("127.0.0.1", 13378)
@@ -49,9 +49,9 @@ end]]
 			print("Error connecting to Java!");
 		end
 	end
-end]]
+end
 
---[[function Bridge.tweet(message)
+function Bridge.tweet(message)
 	if INTERNAL and STREAMING_MODE then
 		print("tweet::"..message)
 		return send("tweet", message)
@@ -70,7 +70,7 @@ function Bridge.chat(message, extra, newLine)
 		p(message, newLine)
 	end
 	return send("msg", "/me "..message)
-end]]
+end
 
 function Bridge.time(message)
 	if not timeStopped then
@@ -82,7 +82,7 @@ function Bridge.stats(message)
 	return send("stats", message)
 end
 
---[[function Bridge.command(command)
+function Bridge.command(command)
 	return send("livesplit_command", command);
 end
 
@@ -100,7 +100,7 @@ function Bridge.process()
 
 		end
 	end
-end]]
+end
 
 function Bridge.input(key)
 	send("input", key)
@@ -116,7 +116,7 @@ function Bridge.hp(curr, max)
 	send("hp", curr..","..max)
 end
 
---[[function Bridge.liveSplit()
+function Bridge.liveSplit()
 	send("start")
 	timeStopped = false
 end
@@ -126,7 +126,7 @@ function Bridge.split(finished)
 		timeStopped = true
 	end
 	send("split")
-end]]
+end
 
 function Bridge.encounter()
 	send("encounter")

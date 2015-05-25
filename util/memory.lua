@@ -29,12 +29,12 @@ local memoryNames = {
 		column = 0x0F65,
 		current = 0x00DF,		--32=off 79=on instead of 20=on
 		size = 0x0FA3,
-		option_current = 0x0F84,--DONE used while settings options (5=startmenu, 7=optionmenu)
-		shop_current = 0x0F87,	--DONE 95=main 94=buy 80=ammount 30=accept 74=sell instead of 32=main 158/161=amount 20=buy/accept 248=sell
-		selection = 0x0F78,		--DONE ?? going like 1 or 2 or 4 etc...
-		text_input = 0x0F69,	--DONE 65=inputing
-		text_length = 0x06D2,	--DONE
-		main = 0x04AA,			--DONE 121=open
+		option_current = 0x0F84,--used while settings options (5=startmenu, 7=optionmenu)
+		shop_current = 0x0F87,	--95=main 94=buy 80=ammount 30=accept 74=sell instead of 32=main 158/161=amount 20=buy/accept 248=sell
+		selection = 0x0F78,		--going like 1 or 2 or 4 etc...
+		text_input = 0x0F69,	--65=inputing
+		text_length = 0x06D2,
+		main = 0x04AA,			--21=open
 		--pokemon = 0x0C51,			--TO DO, USED WHILE EVOLVING
 		--selection_mode = 0x0C35,	--TO DO, USED WHEN SWAPING MOVE
 		--transaction_current = 0x0F8B,--TODO, USED FOR SHOPPING
@@ -64,37 +64,39 @@ local memoryNames = {
 		--inside_area = 0x02D0,	--can be used while inside a area we can use escape_rope?
 	},
 	time = {
-		hours = 0x14C4,			--DONE or 0xD4C5
-		minutes = 0x14C6,		--DONE
-		seconds = 0x14C7,		--DONE
-		frames = 0x14C8,		--DONE
+		hours = 0x14C4,			--or 0xD4C5
+		minutes = 0x14C6,
+		seconds = 0x14C7,
+		frames = 0x14C8,
 	},
 	shop = {
-		transaction_amount = 0x110C,--DONE
+		transaction_amount = 0x110C,
 	},
 	battle = {
-		text = 0x0FCF,				--DONE 1=11(texting) // 3=1(not)
-		menu = 0x0FB6,				--DONE 106=106(att) // 186=94(free) // 128=233(item) // 145=224(pkmon)
-		menuX = 0x0FAA,				--DONE used for battle Row-X
-		menuY = 0x0FA9,				--DONE used for battle Row-Y
-		battle_turns = 0x06DD,		--DONE?? USED FOR DSUM ESCAPE??
+		text = 0x0FCF,				--1=11(texting) // 3=1(not)
+		menu = 0x0FB6,				--106=106(att) // 186=94(free) // 128=233(item) // 145=224(pkmon)
+		menuX = 0x0FAA,				--used for battle Row-X
+		menuY = 0x0FA9,				--used for battle Row-Y
+		battle_turns = 0x06DD,		--USED FOR DSUM ESCAPE??
 		
-		opponent_id = 0x1206,		--DONE or 0x1204
-		opponent_level = 0x1213,	--DONE
-		opponent_type1 = 0x1224,	--DONE
-		opponent_type2 = 0x1225,	--DONE
-		opponent_move_id = 0x1208,		--DONE used to get opponent moves ID
-		opponent_move_pp = 0x120E,		--DONE used to get opponent moves PP
+		opponent_id = 0x1206,		--or 0x1204
+		opponent_level = 0x1213,
+		opponent_type1 = 0x1224,
+		opponent_type2 = 0x1225,
+		--opponent_move_id = 0x1208,	--used to get opponent moves ID
+		--opponent_move_pp = 0x120E,	--used to get opponent moves PP
 
-		our_id = 0x1205,			--DONE old=1014
-		our_status = 0x063A,		--DONE
-		our_level = 0x0639,			--DONE
-		our_type1 = 0x064A,			--DONE
-		our_type2 = 0x064B,			--DONE
-		our_move_id = 0x062E,		--DONE used to get our moves ID
-		our_move_pp = 0x0634,		--DONE used to get our moves PP
+		our_id = 0x1205,			--old=1014
+		our_status = 0x063A,
+		our_level = 0x0639,
+		our_type1 = 0x064A,
+		our_type2 = 0x064B,
+		--our_move_id = 0x062E,		--used to get our moves ID
+		--our_move_pp = 0x0634,		--used to get our moves PP
 		
-		--attack_turns = 0x06DC,	--DONE?? NOT USED??
+		--our_pokemon_list = 0x1288	--used to retract any of our pokemon values (slot 1-6)
+		
+		--attack_turns = 0x06DC,	--NOT USED??
 		--accuracy = 0x0D1E,
 		--x_accuracy = 0x1063,
 		--disabled = 0x0CEE,
@@ -122,21 +124,21 @@ local memoryNames = {
 
 local doubleNames = {
 	battle = {
-		opponent_hp = 0x1216,			--DONE 10FF index +278? // 
-		opponent_max_hp = 0x1218,		--DONE
-		opponent_attack = 0x121A,		--DONE
-		opponent_defense = 0x121C,		--DONE
-		opponent_speed = 0x121E,		--DONE
-		opponent_special_attack = 0x1220,--DONE
-		opponent_special_defense = 0x1222,--DONE
+		opponent_hp = 0x1216,			--10FF index +278? // 
+		opponent_max_hp = 0x1218,
+		opponent_attack = 0x121A,
+		opponent_defense = 0x121C,
+		opponent_speed = 0x121E,
+		opponent_special_attack = 0x1220,
+		opponent_special_defense = 0x1222,
 
-		our_hp = 0x063C,				--DONE
-		our_max_hp = 0x063E,			--DONE
-		our_attack = 0x0640,			--DONE
-		our_defense = 0x0642,			--DONE
-		our_speed = 0x0644,				--DONE
-		our_special_attack = 0x0646,	--DONE
-		our_special_defense = 0x0648,	--DONE
+		our_hp = 0x063C,
+		our_max_hp = 0x063E,
+		our_attack = 0x0640,
+		our_defense = 0x0642,
+		our_speed = 0x0644,
+		our_special_attack = 0x0646,
+		our_special_defense = 0x0648,
 	},
 	
 	--[[pokemon = {
@@ -177,12 +179,22 @@ function Memory.double(section, key)
 	return raw(first) + raw(first + 1)
 end
 
-function Memory.value(section, key, forYellow)
+--function Memory.value(section, key, forYellow)
+function Memory.value(section, key)
 	local memoryAddress = memoryNames[section]
 	if key then
 		memoryAddress = memoryAddress[key]
 	end
-	return raw(memoryAddress, forYellow)
+	--return raw(memoryAddress, forYellow)
+	return raw(memoryAddress)
+end
+
+function Memory.getAddress(section, key)
+	local memoryAddress = memoryNames[section]
+	if key then
+		memoryAddress = memoryAddress[key]
+	end
+	return memoryAddress
 end
 
 return Memory

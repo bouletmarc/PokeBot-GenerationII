@@ -4,7 +4,6 @@ local Input = require "util.input"
 local Memory = require "util.memory"
 local Menu = require "util.menu"
 
---local alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ *():;[]ab-?!mf/.,"
 local alphabet_upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ -?1/.,   "
 local alphabet_lower = "abcdefghijklmnopqrstuvw<yz x():;[]{}"
 -- < = special X
@@ -30,8 +29,7 @@ end
 
 function Textbox.name(letter, randomize)
 	local inputting = false
-	--if letter ~= TOTODILE_NAME and Memory.value("menu", "current") == 231 then	--french
-	if letter ~= TOTODILE_NAME and Memory.value("menu", "current") == 232 then		--english
+	if letter ~= TOTODILE_NAME and Memory.value("menu", "current") == 232 then
 		inputting = true
 	elseif letter == TOTODILE_NAME and Memory.value("menu", "option_current") == 17 then
 		inputting = true
@@ -44,7 +42,6 @@ function Textbox.name(letter, randomize)
 		local ccol
 		local dcol
 		local NameTable = {}
-		local Waiting
 		
 		--if letter then
 			--RUNNING4NEWGAME = false	--make sure it's not running if we begin a game
@@ -83,7 +80,6 @@ function Textbox.name(letter, randomize)
 							end
 						end
 						lidx = getIndexForLetter(NameTable[TableNumber], GetUpper)
-						--lidx = getIndexForLetter(string.upper(NameTable[TableNumber]))
 					--end
 					--Check For Waiting
 					local Waiting = Input.isWaiting()
@@ -109,7 +105,6 @@ function Textbox.name(letter, randomize)
 							end
 						--Get/Set Letter
 						else
-							--local LineIndex = math.ceil(lidx/9)
 							crow = Memory.value("text_inputing", "row")
 							drow = math.ceil(lidx/9)-1
 							if crow < drow then
@@ -124,7 +119,6 @@ function Textbox.name(letter, randomize)
 								elseif ccol > dcol then
 									Input.press("Left", 2)
 								elseif ccol == dcol then
-								--if Menu.sidle(ccol, dcol, 8, true) then
 									Input.press("A", 2)
 									if Memory.value("menu", "text_length") == TableNumber then
 										TableNumber = TableNumber + 1

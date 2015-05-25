@@ -62,47 +62,58 @@ local moveList = {
 	rock_slide = 157,
 }
 
---[[local data = {
-	hp = {1, true},
-	status = {4},
-	moves = {8},
-	pp = {28},
-	level = {33},
-	max_hp = {34, true},
-
-	attack = {36, true},
-	defense = {38, true},
-	speed = {40, true},
-	special = {42, true},
-}]]
+local data = {
+	moves = {2},
+	
+	exp = {7, true, true}, --0x1CE7
+	
+	pp = {23},
+	
+	level = {31},
+	status = {32},
+	
+	hp = {34, true},
+	max_hp = {36, true},
+	attack = {38, true},
+	defense = {40, true},
+	speed = {42, true},
+	special_attack = {44, true},
+	special_defense = {46, true},
+}
 
 local previousPartySize
 
---[[local function getAddress(index)
-	return 0x116B + index * 0x2C
-end]]
+local function getAddress(index)
+	return 0x1CDF + index * 0x30	--+48 index
+end
 
---local function index(index, offset)
---[[local function index(index)
+local function index(index, offset)
 	local double
-	--if not offset then
-	--	offset = 0
-	--else
-	--	local dataTable = data[offset]
-	--	offset = dataTable[1]
-	--	double = dataTable[2]
-	--end
+	local triple
+	if not offset then
+		offset = 0
+	else
+		local dataTable = data[offset]
+		offset = dataTable[1]
+		double = dataTable[2]
+		triple = dataTable[3]
+	end
+	
 	local address = getAddress(index) + offset
-	local address = getAddress(index)
 	local value = Memory.raw(address)
-	if double then
+	if double and not triple then
 		value = value + Memory.raw(address + 1)
+	elseif double and triple then
+		--read double exp
+		value = value * 256 + Memory.raw(address + 1)
+		--read triple exp
+		value = value * 256 + Memory.raw(address + 2)
 	end
 	return value
 end
-Pokemon.index = index]]
+Pokemon.index = index
 
---[[local function indexOf(...)
+local function indexOf(...)
 	for ni,name in ipairs(arg) do
 		local pid = pokeIDs[name]
 		for i=0,5 do
@@ -114,7 +125,7 @@ Pokemon.index = index]]
 	end
 	return -1
 end
-Pokemon.indexOf = indexOf]]
+Pokemon.indexOf = indexOf
 
 -- Table functions
 
@@ -128,7 +139,7 @@ function Pokemon.battleMove(name)
 	end
 end
 
---[[function Pokemon.moveIndex(move, pokemon)
+function Pokemon.moveIndex(move, pokemon)
 	local pokemonIdx
 	if pokemon then
 		pokemonIdx = indexOf(pokemon)
@@ -142,13 +153,11 @@ end
 			return i
 		end
 	end
-end]]
+end
 
---function Pokemon.info(name, offset)
---[[function Pokemon.info(name)
-	--return index(indexOf(name), offset)
-	return index(indexOf(name))
-end]]
+function Pokemon.info(name, offset)
+	return index(indexOf(name), offset)
+end
 
 function Pokemon.getID(name)
 	return pokeIDs[name]
@@ -162,24 +171,24 @@ function Pokemon.getName(id)
 	end
 end
 
---[[function Pokemon.getSacrifice(...)
+function Pokemon.getSacrifice(...)
 	for i,name in ipairs(arg) do
 		local pokemonIndex = indexOf(name)
 		if pokemonIndex ~= -1 and index(pokemonIndex, "hp") > 0 then
 			return name
 		end
 	end
-end]]
+end
 
---[[function Pokemon.inParty(...)
+function Pokemon.inParty(...)
 	for i,name in ipairs(arg) do
 		if indexOf(name) ~= -1 then
 			return name
 		end
 	end
-end]]
+end
 
---[[function Pokemon.forMove(move)
+function Pokemon.forMove(move)
 	local moveID = moveList[move]
 	for i=0,5 do
 		local address = getAddress(i)
@@ -190,28 +199,29 @@ end]]
 		end
 	end
 	return -1
-end]]
+end
 
---[[function Pokemon.hasMove(move)
+function Pokemon.hasMove(move)
 	return Pokemon.forMove(move) ~= -1
-end]]
+end
 
 function Pokemon.updateParty()
 	local partySize = Memory.value("player", "party_size")
 	if partySize ~= previousPartySize then
 		--local poke = Pokemon.inParty("tododile", "paras", "spearow", "pidgey", "nidoran", "squirtle")
-		--local poke = Pokemon.inParty("tododile")
-		--if poke then
-		--	Bridge.caught(poke)
-		--	previousPartySize = partySize
-		--end
+		local poke = Pokemon.inParty("tododile")
+		if poke then
+			Bridge.caught(poke)
+			previousPartySize = partySize
+		end
 	end
 end
 
---[[function Pokemon.pp(index, move)
+function Pokemon.pp(index, move)
 	local midx = Pokemon.battleMove(move)
-	return Memory.raw(getAddress(index) + 28 + midx)
-end]]
+	--return Memory.raw(getAddress(index) + 28 + midx)
+	return Memory.raw(getAddress(index) + 22 + midx) --movePP address = +22
+end
 
 -- General
 
@@ -238,14 +248,19 @@ function Pokemon.isEvolving()
 	--return Memory.value("menu", "pokemon") == 144
 end
 
---[[function Pokemon.getExp()
-	return Memory.raw(0x117A) * 256 + Memory.raw(0x117B)
-end]]
+function Pokemon.getExp(name)
+	local Index = 0
+	if name then
+		Index = indexOf(name)
+	end
+	return index(Index, "exp")
+	--return Memory.raw(0x117A) * 256 + Memory.raw(0x117B)
+end
 
---[[function Pokemon.inRedBar()
+function Pokemon.inRedBar()
 	local curr_hp, max_hp = index(0, "hp"), index(0, "max_hp")
 	return curr_hp / max_hp <= 0.2
-end]]
+end
 
 function Pokemon.use(move)
 	--local main = Memory.value("menu", "main")
@@ -313,13 +328,13 @@ function Pokemon.use(move)
 	return true
 end
 
---[[function Pokemon.getDVs(name)
+function Pokemon.getDVs(name)
 	local index = Pokemon.indexOf(name)
 	local baseAddress = getAddress(index)
-	local attackDefense = Memory.raw(baseAddress + 0x1B)
-	local speedSpecial = Memory.raw(baseAddress + 0x1C)
+	local attackDefense = Memory.raw(baseAddress + 0x14)	--+20 index
+	local speedSpecial = Memory.raw(baseAddress + 0x15)		--+21 index
 	return bit.rshift(attackDefense, 4), bit.band(attackDefense, 15), bit.rshift(speedSpecial, 4), bit.band(speedSpecial, 15)
-end]]
+end
 
 return Pokemon
 

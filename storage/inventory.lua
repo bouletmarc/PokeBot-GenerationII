@@ -9,53 +9,6 @@ local Pokemon = require "storage.pokemon"
 
 local ItemList = require "storage.itemlist"
 
---[[local items = {
-	pokeball = 4,
-	bicycle = 6,
-	moon_stone = 10,
-	antidote = 11,
-	burn_heal = 12,
-	paralyze_heal = 15,
-	full_restore = 16,
-	super_potion = 19,
-	potion = 20,
-	escape_rope = 29,
-	carbos = 38,
-	repel = 30,
-
-	rare_candy = 40,
-	helix_fossil = 42,
-	nugget = 49,
-	pokedoll = 51,
-	super_repel = 56,
-	fresh_water = 60,
-	soda_pop = 61,
-	coin_case = 69,
-	pokeflute = 73,
-	ether = 80,
-	max_ether = 81,
-	elixer = 82,
-
-	x_accuracy = 46,
-	x_speed = 67,
-	x_special = 68,
-
-	cut = 196,
-	fly = 197,
-	surf = 198,
-	strength = 199,
-
-	horn_drill = 207,
-	bubblebeam = 211,
-	water_gun = 212,
-	ice_beam = 213,
-	thunderbolt = 224,
-	earthquake = 226,
-	dig = 228,
-	tm34 = 234,
-	rock_slide = 248,
-}]]
-
 local ITEM_BASE = Memory.value("inventory", "item_base")
 
 -- Data
@@ -139,7 +92,6 @@ end
 function Inventory.use(item, poke, midfight, BagMenu)
 	if midfight then
 		local battleMenu = Memory.value("battle", "menu")
-		--if battleMenu == 94 then
 		--open bag menu
 		if battleMenu == 186 then
 			local rowSelected = Memory.value("battle", "menuY")
@@ -154,7 +106,6 @@ function Inventory.use(item, poke, midfight, BagMenu)
 			else
 				Input.press("Left")
 			end
-		--elseif battleMenu == 233 then
 		--inside bag menu
 		elseif battleMenu == 128 then
 			--if its not done
@@ -177,9 +128,9 @@ function Inventory.use(item, poke, midfight, BagMenu)
 			end
 		elseif Utils.onPokemonSelect(battleMenu) then
 			if poke then
-				--if type(poke) == "string" then
-				--	poke = Pokemon.indexOf(poke)
-				--end
+				if type(poke) == "string" then
+					poke = Pokemon.indexOf(poke)
+				end
 				Menu.select(poke, true, "input")
 			else
 				Input.press("A")
@@ -231,41 +182,6 @@ function Inventory.use(item, poke, midfight, BagMenu)
 	else
 		return false
 	end
-		
-	--####################################
-	--[[if main == 144 then
-		if Memory.value("battle", "menu") == 95 then
-			Input.press("B")
-		else
-			local idx = 0
-			if poke then
-				idx = Pokemon.indexOf(poke)
-			end
-			Menu.select(idx, true)
-		end
-	elseif main == 128 or main == 60 then
-		if column == 5 then
-			Menu.select(Inventory.indexOf(item), "accelerate", true)
-		elseif column == 11 then
-			Menu.select(2, true)
-		elseif column == 14 then
-			Menu.select(0, true)
-		else
-			local index = 0
-			if poke then
-				index = Pokemon.indexOf(poke)
-			end
-			Menu.select(index, true)
-		end
-	elseif main == 228 then
-		if column == 14 and Memory.value("battle", "menu") == 95 then
-			Input.press("B")
-		end
-	elseif main == Menu.pokemon then
-		Input.press("B")
-	else
-		return false
-	end]]
 	return true
 end
 

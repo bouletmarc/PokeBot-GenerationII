@@ -23,9 +23,9 @@ Control.moonEncounters = nil
 Control.getMoonExp = true
 Control.yolo = false
 
---[[local function withinOneKill(forExp)
+local function withinOneKill(forExp)
 	return Pokemon.getExp() + 80 > forExp
-end]]
+end
 
 local controlFunctions = {
 	
@@ -50,10 +50,6 @@ local controlFunctions = {
 
 	pp = function(data)
 		Combat.factorPP(data.on)
-	end,
-
-	setThrash = function(data)
-		Combat.disableThrash = data.disable
 	end,
 
 	disableCatch = function()
@@ -109,7 +105,7 @@ local function isNewFight()
 	end
 end
 
---[[function Control.shouldFight()
+function Control.shouldFight()
 	if not shouldFight then
 		return false
 	end
@@ -129,7 +125,7 @@ end
 			end
 		end
 	end
-end`]]
+end
 
 function Control.canCatch(partySize)
 	if not partySize then
@@ -145,7 +141,7 @@ function Control.canCatch(partySize)
 	return true
 end
 
---[[function Control.shouldCatch(partySize)
+function Control.shouldCatch(partySize)
 	if maxEncounters and encounters > maxEncounters then
 		local extraCount = extraEncounter and Pokemon.inParty(extraEncounter)
 		if not extraCount or encounters > maxEncounters + 1 then
@@ -183,7 +179,7 @@ end
 			end
 		end
 	end
-end]]
+end
 
 -- Items
 
@@ -252,20 +248,19 @@ function Control.encounter(battleState)
 					--end
 				end
 			else
-				--if opponentHP == 0 and shouldCatch and not Control.killedCatch then
-				--if opponentHP == 0 and shouldCatch then
-					--local gottaCatchEm = {"pidgey", "spearow", "paras", "oddish"}
-					--local opponent = Battle.opponent()
-					--for i,catch in ipairs(gottaCatchEm) do
-					--	if opponent == catch then
-					--		if not Pokemon.inParty(catch) then
-					--			Bridge.chat("accidentally killed "..Utils.capitalize(catch).." with a "..(isCritical and "critical" or "high damage range").." :(")
-					--			Control.killedCatch = true
-					--		end
-					--		break
-					--	end
-					--end
-				--end
+				if opponentHP == 0 and shouldCatch and not Control.killedCatch then
+					local gottaCatchEm = {"pidgey", "spearow", "paras", "oddish"}
+					local opponent = Battle.opponent()
+					for i,catch in ipairs(gottaCatchEm) do
+						if opponent == catch then
+							if not Pokemon.inParty(catch) then
+								Bridge.chat("accidentally killed "..Utils.capitalize(catch).." with a "..(isCritical and "critical" or "high damage range").." :(")
+								Control.killedCatch = true
+							end
+							break
+						end
+					end
+				end
 			end
 		end
 	elseif Control.inBattle then
@@ -279,8 +274,8 @@ end
 function Control.reset()
 	canDie = false
 	oneHits = false
-	--shouldCatch = nil
-	--shouldFight = nil
+	shouldCatch = nil
+	shouldFight = nil
 	extraEncounter = nil
 	potionInBattle = true
 	encounters = 0

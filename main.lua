@@ -9,7 +9,7 @@ RESET_FOR_TIME = false 			-- Set to false if you just want to see the bot finish
 RESET_FOR_ENCOUNTERS = false 	-- Set to false if you just want to see the bot finish a run without reset for encounters
 
 --Game Settings
-GAME_NAME = "Crystal"			-- Set to Gold/Silver or Crystal
+GAME_NAME = "Crystal"			-- Set to Gold/Silver(not done) or Crystal
 GAME_RUN = ""					-- Set to "" or "" for the run you want
 GAME_HOURS = 17					-- Set the internal game hour (0-23h)
 GAME_MINUTES = 35				-- Set the internal game minutes (0-59min)
@@ -23,14 +23,6 @@ GAME_SOUND_STYLE = 145			-- Set the sound style (132 or 141 // stereo-mono)
 GAME_PRINT_STYLE = 127			-- Set the print style (64=normal // 96=dark // 127=dark+ // 0=clear+ // 32=clear)
 GAME_ACCOUNT_STYLE = 0			-- Set the account style (0-1 // no-yes)
 GAME_WINDOWS_STYLE = 3			-- Set the windows style (0-7)
-
---GAME_TEXT_SPEED = 249			-- Set the Text Speed (247-249 // slow-fast)
---GAME_BATTLE_ANIMATION = 141		-- Set the battle animation (141-142 // no-yes)
---GAME_BATTLE_STYLE = 131			-- Set the battle style (130-131 // choice-set)
---GAME_SOUND_STYLE = 132			-- Set the sound style (132 or 141 // stereo-mono)
---GAME_PRINT_STYLE = 127			-- Set the print style (64=normal // 96=dark // 127=dark+ // 0=clear+ // 32=clear)
---GAME_ACCOUNT_STYLE = 0			-- Set the account style (0-1 // no-yes)
---GAME_WINDOWS_STYLE = 3			-- Set the windows style (0-7)
 
 --Connection Settings
 INTERNAL = false				-- Allow connection with LiveSplit ?
@@ -67,38 +59,19 @@ PRINT_STEP = false				-- Print the current step in the console.
 
 -- SET VALUES
 
-local VERSION = "1.0"
-
---YELLOW = memory.getcurrentmemorydomainsize() > 30000
+local VERSION = "0.2-BETA"
 
 local START_WAIT = 99
 local hasAlreadyStartedPlaying = false
 local oldSeconds
 local running = true
 local lastHP
---FirstSpawnDone = false
---FirstSpawnDone2 = false
 
 --RUNNING4CONTINUE = false		--used to continue a game
 --RUNNING4NEWGAME = true			--used to make a new game (remove last save also)
 --EXTERNALDONE = false			--used when the above settings are done externally
 --local InternalDone = false 		--used when the above settings are done internally
 --local UsingCustomPath = false	--used when we set a custom path
-
--- SET DIR
-
---[[local lowerGameRun = string.lower(GAME_RUN)
-local lowerGameName = string.lower(GAME_NAME)
-local secondStratDir = ""
-local secondPaintDir = ""
-if lowerGameRun == "no save corruption" then
-	if lowerGameName == "red" or lowerGameName == "blue" then
-		secondStratDir = ".red-blue"
-		secondPaintDir = secondStratDir
-	end
-else
-	secondStratDir = YELLOW and ".yellow" or ".red-blue"
-end]]
 
 -- LOAD DIR
 
@@ -152,8 +125,6 @@ local function resetAll()
 	Bridge.reset()
 	oldSeconds = 0
 	running = false
-	--FirstSpawnDone = false
-	--FirstSpawnDone2 = false
 	-- client.speedmode = 200
 	
 	if CUSTOM_SEED then
@@ -175,9 +146,9 @@ p("Actually running Pokemon "..GAME_NAME.." Speedruns by "..OWNER, true)
 Control.init()
 
 --STREAMING_MODE = not walk.init()
---if INTERNAL and STREAMING_MODE then
---	RESET_FOR_TIME = true
---end
+if INTERNAL and STREAMING_MODE then
+	RESET_FOR_TIME = true
+end
 
 if CUSTOM_SEED then
 	client.reboot_core()
@@ -190,11 +161,11 @@ if RESET_FOR_TIME and hasAlreadyStartedPlaying then
 	RESET_FOR_TIME = false
 	p("Disabling time-limit resets as the game is already running. Please reset the emulator and restart the script if you'd like to go for a fast time.", true)
 end
---if STREAMING_MODE then
---	Bridge.init()
---else
+if STREAMING_MODE then
+	Bridge.init()
+else
 	Input.setDebug(true)
---end
+end
 
 --if PATH_IDX ~= 0 and STEP_IDX ~= 0 then
 --	UsingCustomPath = true
@@ -226,58 +197,35 @@ while true do
 	--end
 
 	if not Input.update() then
-		--if not Utils.ingame() then
 		if not Utils.ingame() and currentMap == 0 then
 		--if not Utils.ingame() and currentMap == 0 and currentMap2 == 0 then
-			--if currentMap == 0 then
-				if running then
-					if not hasAlreadyStartedPlaying then
-						client.reboot_core()	--remove this for the new bizhawk
-						hasAlreadyStartedPlaying = true
-					else
-						--if not RUNNING4CONTINUE then
-							resetAll()	--reset if not running to continue
-							--RUNNING4NEWGAME = true --set back on in case we done a reboot
-						--else
-						--	running = false	 --continue adventure
-						--end
-					end
+			if running then
+				if not hasAlreadyStartedPlaying then
+					client.reboot_core()
+					hasAlreadyStartedPlaying = true
 				else
-					--if UsingCustomPath then
-					--	if not EXTERNALDONE then	--continue adventure
-					--		RUNNING4CONTINUE, RUNNING4NEWGAME = true, false
-					--	elseif EXTERNALDONE and InternalDone then
-					--		RUNNING4NEWGAME = true	--set back to new game
-					--	end
+					--if not RUNNING4CONTINUE then
+						resetAll()	--reset if not running to continue
+						--RUNNING4NEWGAME = true --set back on in case we done a reboot
+					--else
+					--	running = false	 --continue adventure
 					--end
-					Settings.startNewAdventure(START_WAIT) --start/continue adventure
 				end
-			--else
-				--if not running then
-				--	Bridge.liveSplit()
-				--	running = true
+			else
+				--if UsingCustomPath then
+				--	if not EXTERNALDONE then	--continue adventure
+				--		RUNNING4CONTINUE, RUNNING4NEWGAME = true, false
+				--	elseif EXTERNALDONE and InternalDone then
+				--		RUNNING4NEWGAME = true	--set back to new game
+				--	end
 				--end
-				--Settings.choosePlayerNames()  --set names
-			--end
+				Settings.startNewAdventure(START_WAIT) --start/continue adventure
+			end
 		else
 			if not running then
-				--Bridge.liveSplit()
+				Bridge.liveSplit()
 				running = true
 			end
-			--open and close menu for first spawn
-			--if Settings.FirstSpawn() then
-				--[[local Done = false
-				local MenuValue = Memory.value("menu", "main")
-				if MenuValue ~= 121 and Textbox.isActive() then
-					Input.press("Start", 2)
-				elseif MenuValue == 121 then
-					Input.press("B", 2)
-					Done = true
-				elseif MenuValue == 2 and not Textbox.isActive() and Done then
-					FirstSpawn = false
-				end
-			end]]
-			--else
 			--if RUNNING4NEWGAME then	--remove last save game
 			--	Settings.RemoveLastAdventure(START_WAIT)
 			--elseif RUNNING4CONTINUE then   --continue the last adventure
@@ -287,18 +235,17 @@ while true do
 			--else
 				local battleState = Memory.value("game", "battle")
 				Control.encounter(battleState)
-				--local curr_hp = Pokemon.index(0, "hp")
-				--if curr_hp == 0 and not Control.canDie() and Pokemon.index(0) > 0 then
-				--	Strategies.death(currentMap, currentMap2)
-				--elseif Walk.strategy then
-				if Walk.strategy then
+				local curr_hp = Pokemon.index(0, "hp")
+				if curr_hp == 0 and not Control.canDie() and Pokemon.index(0) > 0 then
+					Strategies.death(currentMap, currentMap2)
+				elseif Walk.strategy then
 					if Strategies.execute(Walk.strategy) then
 						Walk.traverse(currentMap, currentMap2)
 					end
 				elseif battleState > 0 then
-					--if not Control.shouldCatch(partySize) then
+					if not Control.shouldCatch(partySize) then
 						Battle.automate()
-					--end
+					end
 				elseif Textbox.handle() then
 					Walk.traverse(currentMap, currentMap2)
 				end
@@ -306,14 +253,13 @@ while true do
 		end
 	end
 
-	--[[if STREAMING_MODE then
+	if STREAMING_MODE then
 		local newSeconds = Memory.value("time", "seconds")
 		if newSeconds ~= oldSeconds and (newSeconds > 0 or Memory.value("time", "frames") > 0) then
 			Bridge.time(Utils.elapsedTime())
 			oldSeconds = newSeconds
 		end
-	elseif PAINT_ON then]]
-	if PAINT_ON then
+	elseif PAINT_ON then
 		Paint.draw(currentMap, currentMap2)
 	end
 

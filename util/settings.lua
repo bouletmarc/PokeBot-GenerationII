@@ -8,8 +8,6 @@ local Memory = require "util.memory"
 local Menu = require "util.menu"
 local Utils = require "util.utils"
 
---local START_WAIT = 99
-
 --local tempDir
 
 local settings_menu = 7
@@ -74,8 +72,7 @@ function Settings.startNewAdventure(startWait)
 		end
 	--press A or Start
 	elseif startMenu == 127 then
-		--if MenuCurrent == 59 then	--french
-		if MenuCurrent == 104 then	--english
+		if MenuCurrent == 104 then
 			Input.press("A", 2)
 		else
 			if not Setting_done and math.random(0, startWait) == 0 then
@@ -84,8 +81,7 @@ function Settings.startNewAdventure(startWait)
 		end
 	else
 		--Set Name
-		--if MenuCurrent == 79 then	--french
-		if MenuCurrent == 110 then	--english
+		if MenuCurrent == 110 then
 			if InputRow == 1 and GAME_GENDER == 2 then
 				Input.press("Down", 2)
 			elseif InputRow == 2 and GAME_GENDER == 1 then
@@ -95,8 +91,7 @@ function Settings.startNewAdventure(startWait)
 			end
 		--Set hours/minutes/name
 		elseif MenuCurrent == 32 or MenuCurrent == 107 then
-			--if ShopCurrent == 77 then	--french
-			if ShopCurrent == 78 then	--english
+			if ShopCurrent == 78 then
 				--set hours
 				if HoursRow < GAME_HOURS then
 					Input.press("Up", 1)
@@ -115,8 +110,7 @@ function Settings.startNewAdventure(startWait)
 					Input.press("A", 1)
 				end
 			end
-		--elseif MenuCurrent == 231 then	--french
-		elseif MenuCurrent == 232 then	--english
+		elseif MenuCurrent == 232 then
 			--remake setting not done
 			Setting_done = false
 			--set our name
@@ -126,25 +120,6 @@ function Settings.startNewAdventure(startWait)
 		end
 	end
 end
-
---[[function Settings.FirstSpawn()
-	if not FirstSpawnDone then
-		local MenuValue = Memory.value("menu", "main")
-		if MenuValue == 121 then
-			Input.press("B", 2)
-			FirstSpawnDone2 = true
-		elseif MenuValue == 0 then
-			if Textbox.isActive() then
-				Input.press("Start", 2)
-			elseif not Textbox.isActive() and FirstSpawnDone2 then
-				FirstSpawnDone = true
-				return true
-			end
-		end
-	else
-		return true
-	end
-end]]
 
 --[[function Settings.RemoveLastAdventure(startWait)
 	if not tempDir then
@@ -190,21 +165,7 @@ end]]
 	end
 end]]
 
---[[function Settings.choosePlayerNames()
-	local name = PLAYER_NAME
-	if dirText ~= "glitch" then
-		if (Memory.value("player", "name") ~= 141) or (Memory.value("player", "name2") ~= 136) then
-			name = RIVAL_NAME
-		end
-	else
-		if (Memory.value("player", "name") ~= 141) or (Memory.value("player", "name2") ~= 136) then
-			name = "> "
-		end
-	end
-	Textbox.name(name, true)
-end
-
-function Settings.pollForResponse()
+--[[function Settings.pollForResponse()
 	local response = Bridge.process()
 	if response then
 		Bridge.polling = false

@@ -15,7 +15,7 @@ function Paint.draw(currentMap, currentMap2)
 	drawText(0, 14, currentMap..","..currentMap2.." : "..px.." "..py)
 	drawText(0, 0, elapsedTime())
 
-	--[[if Memory.value("game", "battle") > 0 then
+	if Memory.value("game", "battle") > 0 then
 		local curr_hp = Pokemon.index(0, "hp")
 		local hpStatus
 		if curr_hp == 0 then
@@ -24,7 +24,7 @@ function Paint.draw(currentMap, currentMap2)
 			hpStatus = "RED"
 		end
 		if hpStatus then
-			drawText(120, 7, hpStatus)
+			drawText(0, 70, hpStatus)
 		end
 	end
 
@@ -35,13 +35,13 @@ function Paint.draw(currentMap, currentMap2)
 		local speed = Pokemon.index(tidx, "speed")
 		local scl_att = Pokemon.index(tidx, "special_attack")
 		local scl_def = Pokemon.index(tidx, "special_defense")
-		drawText(0, 134, attack.." Att/"..defense.." Def/"..speed.." Spd/"..scl_att.." Scl_Att/"..scl_def.." Scl_Def")
-	end]]
+		drawText(0, 90, attack.." | "..defense.." | "..speed.." | "..scl_att.." | "..scl_def)
+	end
 	local enc = " encounter"
 	if encounters > 1 then
 		enc = enc.."s"
 	end
-	drawText(0, 90, encounters..enc)
+	drawText(0, 82, encounters..enc)
 	return true
 end
 

@@ -68,17 +68,13 @@ local function recover()
 end
 
 local function openBattleMenu()
-	--if Memory.value("battle", "text") == 1 then
 	if Memory.value("battle", "text") == 3 then
 		Input.cancel()
 		return false
 	end
 	local battleMenu = Memory.value("battle", "menu")
-	--local col = Menu.getCol()
-	--if battleMenu == 106 or (battleMenu == 94 and col == 5) then
 	if battleMenu == 106 then
 		return true
-	--elseif battleMenu == 94 then
 	elseif battleMenu == 186 then
 		local rowSelected = Memory.value("battle", "menuY")
 		local columnSelected = Memory.value("battle", "menuX")
@@ -100,7 +96,6 @@ local function attack(attackIndex)
 	if Memory.double("battle", "opponent_hp") < 1 then
 		Input.cancel()
 	elseif openBattleMenu() then
-		--Menu.select(attackIndex, true, false, false, false, 3)
 		Menu.select(attackIndex, true, false, false, 3)
 	end
 end
@@ -110,7 +105,6 @@ function movePP(name)
 	if not midx then
 		return 0
 	end
-	--return Memory.raw(0x102C + midx)
 	return Memory.raw(0x0634 + midx)
 end
 Battle.pp = movePP
@@ -157,7 +151,6 @@ end
 function Battle.run()
 	if Memory.double("battle", "opponent_hp") < 1 then
 		Input.cancel()
-	--elseif Memory.value("battle", "menu") ~= 94 then
 	elseif Memory.value("battle", "menu") ~= 186 then
 		--if Memory.value("menu", "text_length") == 127 then
 		--	Input.press("B")
@@ -166,27 +159,18 @@ function Battle.run()
 			--Input.cancel()
 		--end
 	elseif Memory.value("battle", "menu") == 186 then
-	--elseif Textbox.handle() then
-		--local rowSelected = Memory.value("battle", "menuY")
-		--local columnSelected = Memory.value("battle", "menuX")
-		--local selected = Memory.value("menu", "selection")
-		--if selected == 239 then
-		--if rowSelected == 2 and columnSelected == 2 then
-		--	Input.press("A", 2)
-		--else
-			Input.escape()
-		--end
+		Input.escape()
 	end
 end
 
 function Battle.handle()
-	--if not Control.shouldCatch() then
-		--if Control.shouldFight() then
-		--	Battle.fight()
-		--else
+	if not Control.shouldCatch() then
+		if Control.shouldFight() then
+			Battle.fight()
+		else
 			Battle.run()
-		--end
-	--end
+		end
+	end
 end
 
 function Battle.handleWild()
@@ -238,7 +222,7 @@ end
 end]]
 
 function Battle.automate(moveName, skipBuffs)
-	--if not recover() then
+	if not recover() then
 		local state = Memory.value("game", "battle")
 		if state == 0 then
 			Input.cancel()
@@ -247,21 +231,21 @@ function Battle.automate(moveName, skipBuffs)
 				moveName = nil
 			end
 			if state == 1 then
-				--if Control.shouldFight() then
-				--	Battle.fight(moveName, skipBuffs)
-				--else
+				if Control.shouldFight() then
+					Battle.fight(moveName, skipBuffs)
+				else
 					Battle.run()
-				--end
+				end
 			elseif state == 2 then
 				Battle.fight(moveName, skipBuffs)
 			end
 		end
-	--end
+	end
 end
 
 -- SACRIFICE
 
---[[function Battle.sacrifice(...)
+function Battle.sacrifice(...)
 	local sacrifice = Pokemon.getSacrifice(...)
 	if sacrifice then
 		Battle.swap(sacrifice)
@@ -270,7 +254,7 @@ end
 	return false
 end
 
-function Battle.redeployNidoking()
+--[[function Battle.redeployNidoking()
 	if Pokemon.isDeployed("nidoking") then
 		return false
 	end

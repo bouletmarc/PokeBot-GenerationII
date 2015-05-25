@@ -75,7 +75,11 @@ function step(dx, dy, hold)
 	if px == dx and py == dy then
 		return true
 	end
-	Input.press(dir(px, py, dx, dy), 0, hold)
+	--get waiting before inputing
+	local Waiting = Input.isWaiting()
+	if not Waiting then
+		Input.press(dir(px, py, dx, dy), 0, hold)
+	end
 end
 Walk.step = step
 

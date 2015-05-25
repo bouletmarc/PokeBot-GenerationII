@@ -5,7 +5,6 @@ local Textbox = require "action.textbox"
 local Input = require "util.input"
 local Memory = require "util.memory"
 
---local facingDirections = {Up=8, Right=1, Left=2, Down=4}
 local facingDirections = {Up=4, Right=12, Left=8, Down=0}
 
 function Player.isFacing(direction)
