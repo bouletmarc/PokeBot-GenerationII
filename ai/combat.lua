@@ -60,18 +60,20 @@ local function calcDamage(move, attacker, defender, rng)
 	if move.fixed then
 		return move.fixed, move.fixed
 	end
-	--[[if move.power == 0 or isDisabled(move.id) then
+	--if move.power == 0 or isDisabled(move.id) then
+	if move.power == 0 then
 		return 0, 0
 	end
 	if move.power > 9000 then
-		if Memory.value("battle", "x_accuracy") == 1 and defender.speed < attacker.speed then
-			return 9001, 9001
-		end
-		return 0, 0
+		--if Memory.value("battle", "x_accuracy") == 1 and defender.speed < attacker.speed then
+		--	return 9001, 9001
+		--end
+		--return 0, 0
+		return 9001, 9001 --should not be here
 	end
-	if move.name == "Thrash" and Combat.disableThrash then
-		return 0, 0
-	end]]
+	--if move.name == "Thrash" and Combat.disableThrash then
+	--	return 0, 0
+	--end
 
 	local attFactor, defFactor
 	if move.special then
@@ -135,16 +137,16 @@ local function getMoves(who)--Get the moveset of us [0] or them [1]
 	local moves = {}
 	local base
 	if who == 1 then
-		base = Memory.value("battle", "opponent_move_id")
+		base = 0x1208
 	else
-		base = Memory.value("battle", "our_move_id")
+		base = 0x062E
 	end
-	for idx=0, 3 do
+	for idx=0,3 do
 		local val = Memory.raw(base + idx)
 		if val > 0 then
 			local moveTable = Movelist.get(val)
 			if who == 0 then
-				moveTable.pp = Memory.value("battle", "our_move_pp")
+				moveTable.pp = Memory.raw(0x0634 + idx)
 			end
 			moves[idx + 1] = moveTable
 		end
@@ -256,9 +258,9 @@ local function activePokemon(preset)
 		hp = Memory.double("battle", "our_hp"),
 		att = Memory.double("battle", "our_attack"),
 		def = Memory.double("battle", "our_defense"),
+		speed = Memory.double("battle", "our_speed"),
 		spec_att = Memory.double("battle", "our_special_attack"),
 		spec_def = Memory.double("battle", "our_special_defense"),
-		speed = Memory.double("battle", "our_speed"),
 		type1 = getOurType(0),
 		type2 = getOurType(1),
 		moves = getMoves(0),
@@ -284,9 +286,9 @@ local function activePokemon(preset)
 			hp = Memory.double("battle", "opponent_hp"),
 			att = Memory.double("battle", "opponent_attack"),
 			def = Memory.double("battle", "opponent_defense"),
+			speed = Memory.double("battle", "opponent_speed"),
 			spec_att = Memory.double("battle", "our_special_attack"),
 			spec_def = Memory.double("battle", "our_special_defense"),
-			speed = Memory.double("battle", "opponent_speed"),
 			type1 = getOpponentType(0),
 			type2 = getOpponentType(1),
 			moves = getMoves(1),
@@ -297,8 +299,11 @@ end
 Combat.activePokemon = activePokemon
 
 local function isSleeping()
-	--return Memory.raw(0x116F) > 1
-	return Memory.value("battle", "our_status") == 14	--######################
+	if Memory.value("battle", "our_status") >= 1 and Memory.value("battle", "our_status") <= 7 then
+		return true
+	else
+		return false
+	end
 end
 Combat.isSleeping = isSleeping
 
@@ -356,9 +361,9 @@ function Combat.inKillRange(draw)
 	end
 	if ours.hp <= hpReq then
 		local outsped = enemyAttack.outspeed
-		if outsped and outsped ~= true then
-			outsped = Memory.value("battle", "attack_turns") > 0
-		end
+		--if outsped and outsped ~= true then
+		--	outsped = Memory.value("battle", "attack_turns") > 0
+		--end
 		if outsped or isConfused or turnsToKill > 1 or ours.speed <= enemy.speed or isSleeping() then
 			return ours, hpReq
 		end

@@ -59,6 +59,12 @@ local controlFunctions = {
 
 	-- EXP
 	
+	falknerExp = function()
+		minExp = 292
+		shouldFight = {{name="sentret"}, {name="poliwag"}, {name="bellsprout"}, {name="hoothoot"}}
+		--add spinarak
+	end,
+	
 	--[[viridianExp = function()
 		minExp = 210
 		shouldFight = {{name="rattata",lvl={2,3}}, {name="pidgey",lvl={2}}}
@@ -72,11 +78,30 @@ local controlFunctions = {
 	nidoranBackupExp = function()
 		minExp = 210
 		shouldFight = {{name="rattata"}, {name="pidgey"}, {name="nidoran"}, {name="nidoranf",lvl={2}}}
-	end,
+	end,]]
 
 	-- CATCH
 	
-	catchNidoran = function()
+	catchSentret = function()
+		print("We'll try to find a cutter !")
+		shouldCatch = {{name="sentret", hp=10}}
+	end,
+	
+	catchPoliwag = function()
+		shouldCatch = {{name="sentret", hp=10}, {name="poliwag", hp=12}}
+	end,
+	
+	catchBellsprout = function()
+		if Pokemon.inParty("sentret") then
+			print("We found a cutter - Sentret !")
+			shouldCatch = {{name="poliwag", hp=12}}
+		else
+			print("We didn't found a cutter so we'll try to find Bellsprout !")
+			shouldCatch = {{name="bellsprout", hp=12}, {name="poliwag", hp=12}}
+		end
+	end,
+	
+	--[[catchNidoran = function()
 		shouldCatch = {{name="nidoran",lvl={3,4}}, {name="spearow"}}
 	end,
 
@@ -132,8 +157,7 @@ function Control.canCatch(partySize)
 		partySize = Memory.value("player", "party_size")
 	end
 	local pokeballs = Inventory.count("pokeball")
-	--local minimumCount = 4 - partySize
-	local minimumCount = 1
+	local minimumCount = 3 - partySize
 	if pokeballs < minimumCount then
 		Strategies.reset("Not enough PokeBalls", pokeballs)
 		return false
@@ -173,7 +197,8 @@ function Control.shouldCatch(partySize)
 				if penultimate then
 					require("action.battle").fight(penultimate.midx)
 				else
-					Inventory.use("pokeball", nil, true)
+					Inventory.use("pokeball", nil, 1)
+					--Inventory.use("pokeball", nil, true, 1)
 				end
 				return true
 			end

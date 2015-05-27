@@ -12,7 +12,7 @@ local Pokemon = require "storage.pokemon"
 
 
 local path, stepIdx, currentMap, currentMap2
-local pathIdx = 0
+local pathIdx = 21	--0 or 14(after elm) or 21(inside gym)
 local customIdx = 1
 local customDir = 1
 --local custom_done = false
@@ -20,11 +20,10 @@ local customDir = 1
 -- Private functions
 
 local function setPath(index, region, region2)
-	--if PRINT_PATH then
-	--	print("Path Idx : "..index.." *******")
-	--end
+	if PRINT_PATH then
+		print("Path Idx : "..index.." *******")
+	end
 	pathIdx = index
-	--stepIdx = 2
 	stepIdx = 3
 	currentMap = region
 	currentMap2 = region2
@@ -46,9 +45,9 @@ end
 end]]
 
 local function completeStep(region, region2)
-	--if PRINT_STEP then
-	--	print("Step Idx : "..stepIdx)
-	--end
+	if PRINT_STEP then
+		print("Step Idx : "..stepIdx)
+	end
 	stepIdx = stepIdx + 1
 	return Walk.traverse(region, region2)
 end

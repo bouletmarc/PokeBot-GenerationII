@@ -29,9 +29,11 @@ end
 
 function Textbox.name(letter, randomize)
 	local inputting = false
-	if letter ~= TOTODILE_NAME and Memory.value("menu", "current") == 232 then
+	if letter == TOTODILE_NAME and Memory.value("menu", "option_current") == 17 then
 		inputting = true
-	elseif letter == TOTODILE_NAME and Memory.value("menu", "option_current") == 17 then
+	elseif letter == RIVAL_NAME and Memory.value("menu", "main") == 96 then
+		inputting = true
+	elseif Memory.value("menu", "current") == 232 then
 		inputting = true
 	end
 	if inputting then
@@ -51,36 +53,24 @@ function Textbox.name(letter, randomize)
 				
 				if NameTable[TableNumber] then
 					local GetUpper = true
-					--Set Special Chars & Get UpperCase
-					--[[if NameTable[TableNumber] == "<" then
-						GetUpper = false
-						lidx = 28
-					elseif NameTable[TableNumber] == "{" then
-						GetUpper = false
-						lidx = 35
-					elseif NameTable[TableNumber] == "}" then
-						GetUpper = false
-						lidx = 36
-					else]]
-						--its a letter
-						if string.match(NameTable[TableNumber], '%a') then
-							if string.match(NameTable[TableNumber], '%u') then
-								--the letter was uppercase
-								GetUpper = true
-							elseif string.match(NameTable[TableNumber], '%l') then
-								--the letter was lowercase
-								GetUpper = false
-							end
-						--its anything but not a letter
-						else
-							if string.find(alphabet_upper, NameTable[TableNumber]) ~= nil then
-								GetUpper = true
-							elseif string.find(alphabet_lower, NameTable[TableNumber]) ~= nil then
-								GetUpper = false
-							end
+					--its a letter
+					if string.match(NameTable[TableNumber], '%a') then
+						if string.match(NameTable[TableNumber], '%u') then
+							--the letter was uppercase
+							GetUpper = true
+						elseif string.match(NameTable[TableNumber], '%l') then
+							--the letter was lowercase
+							GetUpper = false
 						end
-						lidx = getIndexForLetter(NameTable[TableNumber], GetUpper)
-					--end
+					--its anything but not a letter
+					else
+						if string.find(alphabet_upper, NameTable[TableNumber]) ~= nil then
+							GetUpper = true
+						elseif string.find(alphabet_lower, NameTable[TableNumber]) ~= nil then
+							GetUpper = false
+						end
+					end
+					lidx = getIndexForLetter(NameTable[TableNumber], GetUpper)
 					--Check For Waiting
 					local Waiting = Input.isWaiting()
 					--Proceed
@@ -208,7 +198,7 @@ end]]
 end]]
 
 function Textbox.isActive()
-	if Memory.value("game", "textbox") == 65 then
+	if Memory.value("game", "textbox") == 65 or Memory.value("game", "textbox") == 64 then
 		return true
 	elseif Memory.value("game", "textbox") == 1 then
 		return false
@@ -219,7 +209,8 @@ function Textbox.handle()
 	if not Textbox.isActive() then
 		return true
 	end
-	Input.cancel()
+	Input.press("B", 2)
+	--Input.cancel()
 end
 
 return Textbox

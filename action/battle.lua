@@ -50,10 +50,13 @@ local function recover()
 						second = "super_potion"
 					end
 				end
-				local potion = Inventory.contains(first, second)
-				if potionsForHit(potion, currentHP, maxHP) then
-					Inventory.use(potion, nil, true)
-					return true
+				if first == "potion" or first == "super_potion" or first == "full_restore" then
+					local potion = Inventory.contains(first, second)
+					if potionsForHit(potion, currentHP, maxHP) then
+						Inventory.use(potion, nil)
+						--Inventory.use(potion, nil, true)
+						return true
+					end
 				end
 			end
 		end
@@ -61,7 +64,8 @@ local function recover()
 	--[[if Memory.value("battle", "paralyzed") == 64 then
 		local heals = Inventory.contains("paralyze_heal", "full_restore")
 		if heals then
-			Inventory.use(heals, nil, true)
+			Inventory.use(heals, nil)
+			--Inventory.use(heals, nil, true)
 			return true
 		end
 	end]]
@@ -78,17 +82,17 @@ local function openBattleMenu()
 	elseif battleMenu == 186 then
 		local rowSelected = Memory.value("battle", "menuY")
 		local columnSelected = Memory.value("battle", "menuX")
-		if columnSelected == 0 then
-			if rowSelected == 1 then
-				Input.press("Up")
+		if columnSelected == 1 then
+			if rowSelected == 2 then
+				Input.press("Up", 2)
 			else
-				Input.press("A")
+				Input.press("A", 2)
 			end
 		else
-			Input.press("Left")
+			Input.press("Left", 2)
 		end
 	else
-		Input.press("B")
+		Input.press("B", 2)
 	end
 end
 
@@ -96,7 +100,19 @@ local function attack(attackIndex)
 	if Memory.double("battle", "opponent_hp") < 1 then
 		Input.cancel()
 	elseif openBattleMenu() then
-		Menu.select(attackIndex, true, false, false, 3)
+		local AttackRow = Memory.value("menu", "input_row")
+		--get waiting
+		local Waiting = Input.isWaiting()
+		if not Waiting then
+			if AttackRow < attackIndex then
+				Input.press("Down", 1)
+			elseif AttackRow > attackIndex then
+				Input.press("Up", 1)
+			else
+				Input.press("A", 1)
+			end
+		end
+		--Menu.select(attackIndex, true, false, false, 3)
 	end
 end
 
@@ -105,7 +121,12 @@ function movePP(name)
 	if not midx then
 		return 0
 	end
-	return Memory.raw(0x0634 + midx)
+	local PokemonID = Memory.value("battle", "our_id")
+	local PokemonIndex = Pokemon.indexOfbyID(PokemonID)
+	local SearchString = "pp"..midx
+	local MovePP = Pokemon.index(PokemonIndex, SearchString)
+	--return Memory.raw(0x0634 + midx)
+	return MovePP
 end
 Battle.pp = movePP
 
@@ -240,6 +261,20 @@ function Battle.automate(moveName, skipBuffs)
 				Battle.fight(moveName, skipBuffs)
 			end
 		end
+	end
+end
+
+function Battle.inside_menu(inputing)
+	local battleText = Memory.value("battle", "text")
+	local MenuShopCurrent = Memory.value("menu", "shop_current")
+	if battleText ~= 1 or MenuShopCurrent ~= 79 then
+		if inputing then
+			Input.press("A", 2)
+		else
+			return false
+		end
+	elseif battleText == 1 and MenuShopCurrent == 79 then
+		return true
 	end
 end
 

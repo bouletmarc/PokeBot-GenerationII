@@ -5,34 +5,7 @@ local Input = require "util.input"
 local Memory = require "util.memory"
 local Menu = require "util.menu"
 
-local pokeIDs = {
-	pidgey = 16,
-	spearow = 21,
-	rattata = 19,
-	nidoranF = 29,
-	nidoranM = 32,
-	
-	chikorita = 152,
-	bayleef = 153,
-	meganium = 154,
-	
-	cyndaquil = 155,
-	quilava = 156,
-	typhlosion = 157,
-	
-	totodile = 158,
-	croconaw = 159,
-	feraligatr = 160,
-	
-	sentret = 161,
-	furret = 162,
-	hoothoot = 163,
-	marill = 183,
-	azumarill = 184,
-	sudowoodo = 185,
-	politoed = 186,
-	hoppip = 187,
-}
+local PokemonList = require "storage.pokemonlist"
 
 local moveList = {
 	cut = 15,
@@ -59,19 +32,23 @@ local moveList = {
 	thunderbolt = 85,
 	earthquake = 89,
 	dig = 91,
+	rage = 99,
 	rock_slide = 157,
 }
 
 local data = {
-	moves = {2},
-	
+	held = {1},
+	move1 = {2},
+	move2 = {3},
+	move3 = {4},
+	move4 = {5},
 	exp = {7, true, true}, --0x1CE7
-	
-	pp = {23},
-	
+	pp1 = {23},
+	pp2 = {24},
+	pp3 = {25},
+	pp4 = {26},
 	level = {31},
 	status = {32},
-	
 	hp = {34, true},
 	max_hp = {36, true},
 	attack = {38, true},
@@ -84,7 +61,7 @@ local data = {
 local previousPartySize
 
 local function getAddress(index)
-	return 0x1CDF + index * 0x30	--+48 index
+	return 0x1CDF + index * 0x30
 end
 
 local function index(index, offset)
@@ -115,7 +92,8 @@ Pokemon.index = index
 
 local function indexOf(...)
 	for ni,name in ipairs(arg) do
-		local pid = pokeIDs[name]
+		local pid = PokemonList.ID(name)
+		--local pid = pokeIDs[name]
 		for i=0,5 do
 			local atIdx = index(i)
 			if atIdx == pid then
@@ -127,13 +105,28 @@ local function indexOf(...)
 end
 Pokemon.indexOf = indexOf
 
+local function indexOfbyID(ID)
+	for i=0,5 do
+		local PokemonID = Memory.raw(getAddress(i))
+		if PokemonID == ID then
+			return i
+		end
+	end
+	return -1
+end
+Pokemon.indexOfbyID = indexOfbyID
+
 -- Table functions
 
 function Pokemon.battleMove(name)
 	local mid = moveList[name]
-	for i=0,3 do
-		--if mid == Memory.raw(0x101B + i) then
-		if mid == Memory.raw(0x062E + i) then
+	local PokemonID = Memory.value("battle", "our_id")
+	local PokemonIndex = indexOfbyID(PokemonID)
+	for i=1,4 do
+		local SearchString = "move"..i
+		local MoveID = index(PokemonIndex, SearchString)
+		--if mid == Memory.raw(0x062E + i) then
+		if mid == MoveID then
 			return i
 		end
 	end
@@ -146,7 +139,7 @@ function Pokemon.moveIndex(move, pokemon)
 	else
 		pokemonIdx = 0
 	end
-	local address = getAddress(pokemonIdx) + 7
+	local address = getAddress(pokemonIdx) + 1
 	local mid = moveList[move]
 	for i=1,4 do
 		if mid == Memory.raw(address + i) then
@@ -160,15 +153,17 @@ function Pokemon.info(name, offset)
 end
 
 function Pokemon.getID(name)
-	return pokeIDs[name]
+	--return pokeIDs[name]
+	return PokemonList.ID(name)
 end
 
 function Pokemon.getName(id)
-	for name,pid in pairs(pokeIDs) do
-		if pid == id then
-			return name
-		end
-	end
+	return PokemonList.PokemonName(id)
+	--for name,pid in pairs(pokeIDs) do
+	--	if pid == id then
+	--		return name
+	--	end
+	--end
 end
 
 function Pokemon.getSacrifice(...)
@@ -192,7 +187,7 @@ function Pokemon.forMove(move)
 	local moveID = moveList[move]
 	for i=0,5 do
 		local address = getAddress(i)
-		for j=8,11 do
+		for j=2,5 do
 			if Memory.raw(address + j) == moveID then
 				return i
 			end
@@ -209,7 +204,7 @@ function Pokemon.updateParty()
 	local partySize = Memory.value("player", "party_size")
 	if partySize ~= previousPartySize then
 		--local poke = Pokemon.inParty("tododile", "paras", "spearow", "pidgey", "nidoran", "squirtle")
-		local poke = Pokemon.inParty("tododile")
+		local poke = Pokemon.inParty("tododile", "sentret", "poliwag", "bellsprout")
 		if poke then
 			Bridge.caught(poke)
 			previousPartySize = partySize
@@ -228,7 +223,8 @@ end
 function Pokemon.isOpponent(...)
 	local oid = Memory.value("battle", "opponent_id")
 	for i,name in ipairs(arg) do
-		if oid == pokeIDs[name] then
+		--if oid == pokeIDs[name] then
+		if oid == PokemonList.ID(name) then
 			return name
 		end
 	end
@@ -237,7 +233,8 @@ end
 function Pokemon.isDeployed(...)
 	local deployedID = Memory.value("battle", "our_id")
 	for i,name in ipairs(arg) do
-		if deployedID == pokeIDs[name] then
+		--if deployedID == pokeIDs[name] then
+		if deployedID == PokemonList.ID(name) then
 			return name
 		end
 	end

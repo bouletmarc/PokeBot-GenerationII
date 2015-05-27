@@ -29,11 +29,11 @@ local strategyFunctions = Strategies.functions
 
 Strategies.timeRequirements = {
 
-	--[[charmander = function()
-		return 2.39
+	rival = function()
+		return 6.15
 	end,
 	
-	pidgey = function()
+	--[[pidgey = function()
 		local timeLimit = 7.55
 		return timeLimit
 	end,
@@ -135,8 +135,7 @@ strategyFunctions.talk_mom = function()
 			Input.press("A", 2)
 		elseif CurrentMenu == 32 and status.tempDir then
 			return true
-		--elseif CurrentMenu == 79 then	--french
-		elseif CurrentMenu == 110 then	--english
+		elseif CurrentMenu == 110 then
 			local OptionMenu = Memory.value("menu", "option_current")
 			local DaysRow = Memory.value("menu", "days_row")
 			if OptionMenu == 0 or OptionMenu == 11 then
@@ -156,58 +155,213 @@ strategyFunctions.talk_mom = function()
 	end
 end
 
---strategyFunctions.bulbasaurIChooseYou = function()
 strategyFunctions.totodileIChooseYou = function()
 	if Strategies.initialize() then
 		status.tempDir = false
 	end
-	--if Pokemon.inParty("bulbasaur") then
-	--if Pokemon.inParty("totodile") then
-		--Bridge.caught("bulbasaur")
-	--	Bridge.caught("totodile")
-	--	return true
-	--end
-	if Player.face("Up") then
-		--if Textbox.isActive() then
-		if Textbox.name(TOTODILE_NAME) then
-		--	status.tempDir = true
-		--else
-		--	if status.tempDir then
-		--		status.tempDir = false
-				return true
-		--	else
-		--		Input.press("A", 2)
-		--	end
+	if Pokemon.inParty("totodile") then
+		Bridge.caught("totodile")
+		--check spec
+		local totodileAtt = Pokemon.index(0, "attack")
+		if totodileAtt < 12 then 
+			return Strategies.reset("Bad Totodile Attack : "..totodileAtt.." | Need : 12+")
 		end
-		--Textbox.name(BULBASAUR_NAME)
-		--Textbox.name(TOTODILE_NAME)
+	end
+	if Player.face("Up") then
+		if Textbox.name(TOTODILE_NAME) then
+			return true
+		end
 	end
 end
 
---[[strategyFunctions.fightCharmander = function()
+strategyFunctions.totodileCheckSpec = function()
+	local totodileAtt = Pokemon.index(0, "attack")
+	local totodileDef = Pokemon.index(0, "defense")
+	local totodileSpeed = Pokemon.index(0, "speed")
+	local totodileScl_Def = Pokemon.index(0, "special_defense")
+	if totodileSpeed < 9 then
+		return Strategies.reset("Bad Totodile Speed : "..totodileSpeed.." | Need : 9+")
+	end
+	if totodileScl_Def < 11 then
+		return Strategies.reset("Bad Totodile Special_Defense : "..totodileScl_Def.." | Need : 11+")
+	end
+	if totodileSpeed == 9 then
+		if totodileAtt == 12 then
+			return Strategies.reset("Bad Totodile Attack : "..totodileAtt.." | Need : 13+")
+		else
+			if totodileDef < 12 then
+				return Strategies.reset("Bad Totodile Defense : "..totodileDef.." | Need : 12+")
+			end
+		end
+		print("Totodile Speed are bit low (9spd) but we'll check stats again at level 6")
+	end
+	return true
+end
+
+strategyFunctions.fightRival = function()
 	if status.tries < 9000 and Pokemon.index(0, "level") == 6 then
 		if status.tries > 200 then
-			bulbasaurScl = Pokemon.index(0, "special")
-			if bulbasaurScl < 12 then
-				if UsingSTRATS == "Pidgey" then
-					return Strategies.reset("Bad Bulbasaur for pidgey strats - "..bulbasaurScl.." special")
-				else
-					UsingSTRATS = "PP"
+			--check spec
+			local totodileAtt = Pokemon.index(0, "attack")
+			local totodileSpeed = Pokemon.index(0, "speed")
+			local totodileScl_Att = Pokemon.index(0, "special_attack")
+			local totodileScl_Def = Pokemon.index(0, "special_defense")
+			--check attack
+			if totodileAtt < 14 then
+				if totodileScl_Att < 12 or totodileScl_Def < 12 then
+					return Strategies.reset("Bad Totodile Attack : "..totodileAtt.." | Need : 14+")
 				end
 			end
+			if totodileSpeed < 11 then
+				return Strategies.reset("Bad Totodile Speed : "..totodileSpeed.." | Need : 11+")
+			end
+			if totodileScl_Att < 12 then
+				return Strategies.reset("Bad Totodile Special_Attack : "..totodileScl_Att.." | Need : 12+")
+			end
+			--check special def
+			if totodileAtt < 14 then
+				if totodileScl_Def < 12 then
+					return Strategies.reset("Bad Totodile Special_Defense : "..totodileScl_Def.." | Need : 12+")
+				end
+			else
+				if totodileScl_Def < 11 then
+					return Strategies.reset("Bad Totodile Special_Defense : "..totodileScl_Def.." | Need : 11+")
+				end
+			end
+			--continue everything fine
 			status.tries = 9001
 			return true
 		else
 			status.tries = status.tries + 1
 		end
 	end
-	if Battle.isActive() and Memory.double("battle", "opponent_hp") > 0 and Strategies.resetTime(Strategies.getTimeRequirement("charmander"), "kill Charmander") then
+	if Battle.isActive() and Memory.double("battle", "opponent_hp") > 0 and Strategies.resetTime(Strategies.getTimeRequirement("rival"), "kill Rival") then
 		return true
 	end
-	Battle.automate()
+	if Battle.inside_menu(true) then
+		--Battle.automate()
+		return Strategies.buffTo("leer", nil, 1)
+	end
 end
 
-strategyFunctions.dodgePalletBoy = function()
+strategyFunctions.chooseRivalName = function()
+	if Player.face("Right") then
+		if Textbox.name(RIVAL_NAME) then
+			return true
+		end
+	end
+end
+
+strategyFunctions.howToCatch = function()
+	if Strategies.initialize() then
+		status.tempDir = false
+	end
+	local OptionMenu = Memory.value("menu", "option_current")
+	if OptionMenu ~= 11 and not status.tempDir then
+		Input.press("A", 2)
+	elseif OptionMenu ~= 11 and status.tempDir then
+		return true
+	else
+		Input.press("B", 2)
+		status.tempDir = true
+	end
+end
+
+strategyFunctions.CheckTotoHealth = function()
+	if Strategies.initialize() then
+		status.tempDir = false
+		status.canProgress = false
+	end
+	--check for rage
+	if not Pokemon.index(Pokemon.indexOf("totodile"), "move3") == 99 then
+		return Strategies.reset("Totodile didn't learned Rage at time")
+	end
+	local TotodileHP = Pokemon.index(0, "hp")
+	local TotodileDef = Pokemon.index(0, "defense")
+	local ShouldRecover = false
+	--check if totodile need recovering
+	if TotodileDef <= 14 then
+		if TotodileHP < 33 then
+			ShouldRecover = true
+		end
+	elseif TotodileDef > 14 then
+		if TotodileHP < 25 then
+			ShouldRecover = true
+		end
+	end
+	--recover if needed
+	if ShouldRecover then
+		local px, py = Player.position()
+		local map = Memory.value("game", "map")
+		if map == 5 then
+			if not status.tempDir then
+				if py > 25 then
+					py = 25
+				end
+			else
+				status.canProgress = false
+				return true
+			end
+		elseif map == 10 then
+			if not status.tempDir then
+				if py > 3 then
+					py = 3
+				elseif py == 3 then
+					if Textbox.isActive() then
+						Input.press("A", 2)
+						status.canProgress = true
+					else
+						if status.canProgress then
+							status.tempDir = true
+						else
+							Input.press("A", 2)
+						end
+					end
+				end
+			else
+				if py < 8 then
+					py = 8
+				end
+			end
+		end
+		Walk.step(px, py)
+	else
+		return true
+	end
+end
+
+strategyFunctions.fightBirdKeeperAbe = function()
+	if Battle.inside_menu(true) then
+		return Strategies.buffTo("rage", nil, "infinite")
+	end
+end
+
+strategyFunctions.fightBirdKeeperRod = function()
+	if Battle.inside_menu(true) then
+		return Strategies.buffTo("rage", nil, "infinite")
+	end
+end
+
+strategyFunctions.CheckTotoHealthGym1 = function()
+	local TotodileHP = Pokemon.index(0, "hp")
+	if Strategies.useItem("bitter_berry", "totodile", false, "give") then
+		if TotodileHP < 17 then
+			if Strategies.useItem("potion", "totodile", true) then
+				return true
+			end
+		else
+			return true
+		end
+	end
+end
+
+strategyFunctions.fightFalkner = function()
+	if Battle.inside_menu(true) then
+		return Strategies.buffTo("rage", nil, "infinite")
+	end
+end
+
+--[[strategyFunctions.dodgePalletBoy = function()
 	return Strategies.dodgeUp(0x0223, 14, 14, 15, 7)
 end
 

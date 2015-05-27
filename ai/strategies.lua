@@ -128,27 +128,36 @@ function Strategies.initialize()
 	end
 end
 
---[[function Strategies.buffTo(buff, defLevel, usePPAmount, oneHit)
+function Strategies.buffTo(buff, defLevel, usePPAmount, secondAttack)
 	if Battle.isActive() then
 		status.canProgress = true
 		local forced
+		--go by def level
 		if not usePPAmount then
 			if defLevel and Memory.double("battle", "opponent_defense") > defLevel then
 				forced = buff
 			end
+		--go by use PP amount
 		else
 			local AvailablePP = Battle.pp(buff)
-			if not oneHit then
-				if AvailablePP > usePPAmount then
+			if usePPAmount ~= "infinite" then
+				if Strategies.initialize() then
+					status.tempDir = AvailablePP-usePPAmount
+				end
+				if AvailablePP > status.tempDir and AvailablePP > 0 then
 					forced = buff
 				end
 			else
-				if Strategies.initialize() then
-					status.tempDir = AvailablePP
-				end
-				if AvailablePP > status.tempDir-1 then
+				if AvailablePP > 0 then
 					forced = buff
 				end
+			end
+		end
+		--second attack
+		if forced ~= buff and secondAttack ~= nil then
+			local AvailablePP = Battle.pp(secondAttack)
+			if AvailablePP > 0 then
+				forced = secondAttack
 			end
 		end
 		Battle.automate(forced, true)
@@ -159,7 +168,103 @@ end
 	end
 end
 
-function Strategies.dodgeUp(npc, sx, sy, dodge, offset)
+function Strategies.useItem(item, pokemon, Close, Option)
+	if Strategies.initialize() then
+		status.tempDir = false
+		status.canProgress = false
+	end
+	--set options
+	if not Option then
+		Option = 1 --use
+		status.canProgress = true
+	elseif Option == "give" then
+		--check if the pokemon held a item before give it
+		if not status.canProgress then
+			if Pokemon.index(Pokemon.indexOf(pokemon), "held") ~= 0 then
+				return true
+			elseif Pokemon.index(Pokemon.indexOf(pokemon), "held") == 0 then
+				status.canProgress = true
+			end
+		end
+		Option = 2
+	end
+	--select/give/use items
+	if status.canProgress then
+		local MainMenu = Memory.value("menu", "main")
+		local Row = Memory.value("menu", "row")
+		local ItemRow = Memory.value("menu", "input_row")
+		local Column = Memory.value("menu", "column")
+		local ShopCurrent = Memory.value("menu", "shop_current")
+		local MenuSize = Memory.value("menu", "size")
+		--open menu
+		if MainMenu ~= 50 and MainMenu ~= 121 and MainMenu ~= 127 and not status.tempDir then
+			Input.press("Start", 2)
+		--close menu
+		elseif MainMenu == 1 and status.tempDir then
+			return true
+		--item menu
+		elseif MainMenu == 50 then
+			--select bitter berry and go equip it to totodile
+			if not status.tempDir then
+				if Column ~= 0 then
+					Input.press("Right", 2)
+				else
+					--select item
+					if ShopCurrent ~= 66 then
+						local ItemIdx = Inventory.indexOf(item)
+						if ItemRow ~= ItemIdx+1 then
+							Input.press("Down", 2)
+						else
+							Input.press("A", 2)
+						end
+					--option menu
+					else
+						--reset option with menu size
+						if MenuSize == 3 and Option == 2 then
+							Option = 1
+						end
+						--use/give/toss
+						if ItemRow ~= Option then
+							Input.press("Down", 2)
+						else
+							Input.press("A", 2)
+						end
+					end
+				end
+			--switch to next function
+			else
+				if not Close then
+					return true
+				else
+					Input.press("B", 2)
+				end
+			end
+		--pokemon menu
+		elseif MainMenu == 127 then
+			local PokemonIdx = Pokemon.indexOf(pokemon)
+			if ItemRow ~= PokemonIdx+1 then
+				Input.press("Down", 2)
+			else
+				Input.press("A", 2)
+				status.tempDir = true
+			end
+		--start menu(open bag)
+		elseif MainMenu == 121 and not status.tempDir then
+			if Row < 3 then
+				Input.press("Down", 2)
+			elseif Row > 3 then
+				Input.press("Up", 2)
+			else
+				Input.press("A", 2)
+			end
+		--start menu(close)
+		elseif MainMenu == 121 and status.tempDir then
+			Input.press("B", 2)
+		end
+	end
+end
+
+--[[function Strategies.dodgeUp(npc, sx, sy, dodge, offset)
 	if not Battle.handleWild() then
 		return false
 	end
@@ -242,6 +347,35 @@ Strategies.functions = {
 			elseif Player.interact(data.dir) then
 				status.tries = status.tries + 1
 			end
+		end
+	end,
+	
+	setDirection = function(data)
+		if Player.isFacing(data.dir) then
+			return true
+		else
+			Input.press(data.dir, 2)
+			return true
+		end
+	end,
+	
+	openTextbox = function()
+		if Textbox.isActive() then
+			return true
+		else
+			Input.press("A", 2)
+		end
+	end,
+	
+	use = function(data)
+		local Option
+		if not data.option then
+			Option = false
+		else
+			Option = data.option
+		end
+		if Strategies.useItem(data.item, data.poke, data.close, Option) then
+			return true
 		end
 	end,
 

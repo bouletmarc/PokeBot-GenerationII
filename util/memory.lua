@@ -16,7 +16,7 @@ local memoryNames = {
 	},
 	inventory = {
 		item_count = 0x1892,
-		item_base = 0x1893,
+		--item_base = 0x1893,
 	},
 	menu = {
 		row = 0x0F88,
@@ -105,10 +105,15 @@ local memoryNames = {
 		--miss = 0x105F,
 		--our_turn = 0x1FF1,
 		
-		--TO DO GET SLEEPING STATUS
-		--TO DO GET CONFUSED STATUS
-		--TO DO GET PARALIZED STATUS ?
-		--TO DO GET CRITICAL'D STATUS ?
+		--SLEEPING STATUS	= 1-7
+		--POISONED STATUS	= 8-15  or 24-31   or 40-47   or 56-63   or 72-79   or 88-95   or 104-111 or 120-127 or 136-143 or 152-159 or 168-175 or 184-191 or 200-207 or 216-223 or 232-239 or 248-255
+		--BURN STATUS 		= 16-23 or 48-55   or 80-87   or 112-119 or 144-151 or 176-183 or 208-215 or 240-247
+		--FREEZE STATUS 	= 32-39 or 96-103  or 160-167 or 224-231
+		--PARALIZED STATUS	= 64-71 or 192-199
+		--NOTHING STATUS 	= 128-135
+		
+		--CONFUSED STATUS	= 
+		--CRITICAL'D STATUS	= 
 
 		--opponent_next_move = 0x0CDD,	--C6E4 ?? NOT USED?
 		--opponent_last_move = 0x0FCC,

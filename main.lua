@@ -12,8 +12,8 @@ RESET_FOR_ENCOUNTERS = false 	-- Set to false if you just want to see the bot fi
 GAME_NAME = "Crystal"			-- Set to Gold/Silver(not done) or Crystal
 GAME_RUN = ""					-- Set to "" or "" for the run you want
 GAME_HOURS = 17					-- Set the internal game hour (0-23h)
-GAME_MINUTES = 35				-- Set the internal game minutes (0-59min)
-GAME_DAY = 3 					-- Set the internal game day (0-6 // sunday-saturday)
+GAME_MINUTES = 50				-- Set the internal game minutes (0-59min)
+GAME_DAY = 0 					-- Set the internal game day (0-6 // sunday-saturday)
 GAME_GENDER = 1					-- Set the player gender (1-2 // boy-girl)
 
 GAME_TEXT_SPEED = 128			-- Set the Text Speed (247-249 // slow-fast)
@@ -33,7 +33,7 @@ CUSTOM_SEED = nil		 		-- Set to a known seed to replay it, or leave nil for rand
 PAINT_ON    = true 				-- Display contextual information while the bot runs
 
 --Names Settings 
-PLAYER_NAME = "TeSt"			-- Player name
+PLAYER_NAME = "TeSt-<"			-- Player name
 RIVAL_NAME = "URRival"			-- Rival name
 TOTODILE_NAME = "ToTo"			-- Set Totodile name
 
@@ -59,7 +59,7 @@ PRINT_STEP = false				-- Print the current step in the console.
 
 -- SET VALUES
 
-local VERSION = "0.2-BETA"
+local VERSION = "0.21-BETA"
 
 local START_WAIT = 99
 local hasAlreadyStartedPlaying = false

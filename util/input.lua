@@ -19,17 +19,18 @@ local function bridgeButton(btn)
 end
 
 --local function sendButton(button, ab, hold, newgame)
-local function sendButton(button, ab, hold)
+--local function sendButton(button, ab, hold)
+local function sendButton(button, ab)
 	local inputTable = {}
-	if hold then
-		inputTable = {[button]=true, B=true}
-	else
+	--if hold then
+	--	inputTable = {[button]=true, B=true}
+	--else
 		--if not newgame then
 			inputTable = {[button]=true}
 		--else
 		--	inputTable = {Up=true, B=true, Select=true}
 		--end
-	end
+	--end
 	joypad.set(inputTable)
 	if debug then
 		if hold then
@@ -43,7 +44,7 @@ local function sendButton(button, ab, hold)
 		end
 	end
 	if ab then
-		buttonbutton = "A,B"
+		button = "A,B"
 	end
 	bridgeButton(button)
 	setForFrame = button
@@ -59,7 +60,8 @@ function Input.isWaiting()
 end
 
 --function Input.press(button, frames, hold, newgame)
-function Input.press(button, frames, hold)
+--function Input.press(button, frames, hold)
+function Input.press(button, frames)
 	if setForFrame then
 		print("ERR: Reassigning "..setForFrame.." to "..button)
 		return
@@ -77,7 +79,8 @@ function Input.press(button, frames, hold)
 		remainingFrames = 0
 	end
 	bCancel = button ~= "B"
-	sendButton(button, false, hold)
+	sendButton(button, false)
+	--sendButton(button, false, hold)
 	--sendButton(button, false, hold, newgame)
 end
 
@@ -93,8 +96,8 @@ function Input.cancel()
 		else
 			button = "A"
 		end
-		remainingFrames = 0
 		sendButton(button, true)
+		--sendButton(button, false)
 		bCancel = not bCancel
 	--end
 end
